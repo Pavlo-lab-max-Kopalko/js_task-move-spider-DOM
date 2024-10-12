@@ -1,43 +1,26 @@
 'use strict';
 
+const spider = document.querySelector('.spider');
+const wall = document.querySelector('.wall');
+
 document.addEventListener('click', (e) => {
-  const spider = document.querySelector('.spider');
-  const wall = document.querySelector('.wall');
+  const field = e.target.closest('.wall');
+
+  if (!field) {
+    return;
+  }
+
+  const wallRect = wall.getBoundingClientRect();
+  const spiderRect = spider.getBoundingClientRect();
   const widthSpider = spider.offsetWidth;
-  const borderWidth = Array.from(getComputedStyle(wall).borderTopWidth);
-  const borderWall = borderWidth
-    .filter((x) => x / x === 1 || x === '.')
-    .join('');
+  const border = wall.clientTop;
 
-  wall.style.cssText = 'relative';
-  spider.style.cssText = 'position: fixed';
+  let x = e.clientX - widthSpider / 2 - border - wallRect.left;
+  let y = e.clientY - widthSpider / 2 - border - wallRect.top;
 
-  const minStyleLeft = wall.offsetLeft;
-  const minStyleTop = wall.offsetTop;
+  x = Math.max(0, Math.min(x, wall.clientWidth - spiderRect.width));
+  y = Math.max(0, Math.min(y, wall.clientHeight - spiderRect.height));
 
-  if (e.clientX - widthSpider / 2 < minStyleLeft) {
-    spider.style.left = minStyleLeft + Math.ceil(Number(borderWall)) + 'px';
-  } else if (e.clientX >= minStyleLeft + wall.clientWidth - widthSpider / 2) {
-    spider.style.left =
-      minStyleLeft +
-      Math.ceil(Number(borderWall)) -
-      widthSpider +
-      wall.clientWidth +
-      'px';
-  } else {
-    spider.style.left = e.clientX - widthSpider / 2 + 'px';
-  }
-
-  if (e.clientY - widthSpider / 2 < minStyleTop) {
-    spider.style.top = minStyleTop + Math.ceil(Number(borderWall)) + 'px';
-  } else if (e.clientY >= minStyleTop + wall.clientWidth - widthSpider / 2) {
-    spider.style.top =
-      minStyleTop +
-      Math.ceil(Number(borderWall)) -
-      widthSpider +
-      wall.clientWidth +
-      'px';
-  } else {
-    spider.style.top = e.clientY - widthSpider / 2 + 'px';
-  }
+  spider.style.left = x + 'px';
+  spider.style.top = y + 'px';
 });
